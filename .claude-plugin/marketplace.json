@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "nitrograph",
+  "description": "Nitrograph plugins for Claude Code: agent-first service discovery via MCP.",
+  "owner": {
+    "name": "Nitrograph",
+    "email": "eric@nitrograph.com"
+  },
+  "plugins": [
+    {
+      "name": "nitrograph",
+      "source": "./plugins/nitrograph",
+      "description": "Discover, inspect, and call agent-usable APIs via the Nitrograph network. Adds the four Nitrograph MCP tools and a /discover command.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Nitrograph",
+        "email": "eric@nitrograph.com"
+      },
+      "homepage": "https://nitrograph.com",
+      "repository": "https://github.com/nitrographtech/claude-plugins",
+      "license": "MIT",
+      "keywords": [
+        "mcp",
+        "discovery",
+        "agents",
+        "x402",
+        "service-registry",
+        "api"
+      ],
+      "category": "discovery"
+    }
+  ]
+}
