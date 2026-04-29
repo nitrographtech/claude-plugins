@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "nitrograph",
   "version": "1.0.0",
-  "description": "Discover, inspect, and call agent-usable APIs via the Nitrograph network.",
+  "description": "Discover, inspect, and call agent-usable APIs across x402, MPP, and other paid API rails via Nitrograph.",
   "author": {
     "name": "Nitrograph",
     "email": "eric@nitrograph.com",
@@ -11,11 +11,22 @@
   "homepage": "https://nitrograph.com",
   "repository": "https://github.com/nitrographtech/claude-plugins",
   "license": "MIT",
-  "keywords": ["mcp", "discovery", "agents", "x402", "service-registry"],
+  "keywords": [
+    "mcp",
+    "discovery",
+    "agents",
+    "x402",
+    "mpp",
+    "paid-apis",
+    "call-cards",
+    "service-registry"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/",
   "mcpServers": {
     "nitrograph": {
       "command": "npx",
-      "args": ["-y", "nitrograph", "server"]
+      "args": ["-y", "nitrograph@0.5.4", "server"]
     }
   }
 }
