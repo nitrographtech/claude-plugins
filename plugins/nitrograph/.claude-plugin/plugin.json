@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "nitrograph",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Discover, inspect, and call agent-usable APIs across x402, MPP, and other paid API rails via Nitrograph.",
   "author": {
     "name": "Nitrograph",
@@ -25,8 +25,8 @@
   "commands": "./commands/",
   "mcpServers": {
     "nitrograph": {
-      "command": "npx",
-      "args": ["-y", "nitrograph@0.5.4", "server"]
+      "type": "http",
+      "url": "https://api.nitrograph.com/mcp"
     }
   }
 }
