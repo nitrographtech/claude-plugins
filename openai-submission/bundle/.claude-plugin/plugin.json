@@ -1,8 +1,7 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "nitrograph",
   "version": "1.2.0",
-  "description": "Discover, inspect, and call agent-usable APIs across x402, MPP, and other paid API rails via Nitrograph.",
+  "description": "Search engine for agent commerce. Find, compare, and inspect APIs and services an agent can call for a task, ranked by task fit, price, and health.",
   "author": {
     "name": "Nitrograph",
     "email": "eric@nitrograph.com",
@@ -21,12 +20,5 @@
     "call-cards",
     "service-registry"
   ],
-  "skills": "./skills/",
-  "commands": "./commands/",
-  "mcpServers": {
-    "nitrograph": {
-      "type": "http",
-      "url": "https://api.nitrograph.com/mcp"
-    }
-  }
+  "skills": "./skills/"
 }
