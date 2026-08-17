@@ -30,6 +30,27 @@
         "api"
       ],
       "category": "discovery"
+    },
+    {
+      "name": "nitrograph-research",
+      "source": "./plugins/nitrograph-research",
+      "description": "Validated, pay-per-result research and enrichment: certified suppliers, refunds on failed validation, signed receipts.",
+      "author": {
+        "name": "Nitrograph",
+        "email": "eric@nitrograph.com"
+      },
+      "homepage": "https://nitrograph.com",
+      "repository": "https://github.com/nitrographtech/claude-plugins",
+      "license": "MIT",
+      "keywords": [
+        "research",
+        "enrichment",
+        "web-search",
+        "scraping",
+        "validated-results",
+        "receipts"
+      ],
+      "category": "research"
     }
   ]
 }
