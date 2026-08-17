@@ -1,0 +1,24 @@
+{
+  "name": "nitrograph",
+  "version": "1.2.0",
+  "description": "Search engine for agent commerce. Find, compare, and inspect APIs and services an agent can call for a task, ranked by task fit, price, and health.",
+  "author": {
+    "name": "Nitrograph",
+    "email": "eric@nitrograph.com",
+    "url": "https://nitrograph.com"
+  },
+  "homepage": "https://nitrograph.com",
+  "repository": "https://github.com/nitrographtech/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "discovery",
+    "agents",
+    "x402",
+    "mpp",
+    "paid-apis",
+    "call-cards",
+    "service-registry"
+  ],
+  "skills": "./skills/"
+}
