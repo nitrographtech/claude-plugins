@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "nitrograph-research",
+  "version": "1.0.0",
+  "description": "Validated, pay-per-result research and enrichment: certified suppliers, automatic refunds on failed validation, signed receipts on every call.",
+  "author": {
+    "name": "Nitrograph",
+    "email": "eric@nitrograph.com",
+    "url": "https://nitrograph.com"
+  },
+  "homepage": "https://nitrograph.com",
+  "repository": "https://github.com/nitrographtech/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "research",
+    "enrichment",
+    "web-search",
+    "scraping",
+    "paid-apis",
+    "validated-results",
+    "receipts"
+  ],
+  "skills": "./skills/"
+}
