@@ -20,6 +20,7 @@ Nitrograph is a discovery layer for agent-usable services. Use it to find APIs f
 1. Run discovery with the user's task as a natural-language query.
 2. Omit `filters` unless the user explicitly requested a rail, category, or price ceiling.
 3. Present `results` as the ranked, high-confidence recommendations.
+3a. If the user asks for more options, re-run discovery with `offset` advanced by the number already shown, rather than re-running the same query. The response reports `has_more`.
 4. Keep `related_results` separate as lower-confidence fallbacks. Do not promote them into recommendations.
 5. Do not reorder, regroup, or add your own "notably absent" recommendations. Nitrograph ranking is authoritative.
 6. Before invoking a service, fetch service detail for the selected service using the stable `slug`; include the original user task in the `task` argument when the tool supports it.
@@ -46,11 +47,26 @@ Nitrograph is a discovery layer for agent-usable services. Use it to find APIs f
 
 ## MCP Tool Use
 
+The server exposes six tools. `nitrograph_invoke_service` is available on the default hosted endpoint (`https://api.nitrograph.com/mcp`) and on the local stdio server; it is withheld on the discovery-only endpoint.
+
+| Tool | Use it for |
+|------|------------|
+| `nitrograph_discover` | Search and rank services for a task. Supports `limit`, `offset`, and optional `filters`. |
+| `nitrograph_service_detail` | Full call card for one service by `slug`. |
+| `nitrograph_invoke_service` | Call the selected service through Nitrograph. Records the outcome automatically. |
+| `nitrograph_report_outcome` | Record success/failure of a call you made *directly*, not through invoke. |
+| `nitrograph_report_pattern` | Record a reusable multi-step workflow that worked. |
+| `nitrograph_session_status` | Check remaining quota without consuming any. |
+
 When calling `nitrograph_discover`, the tool's returned markdown display is authoritative user-facing output. Return it as-is when the user asked to see search results. Do not paraphrase or regroup it.
 
 Use `nitrograph_service_detail` after discovery when the user wants to call, inspect, compare deeply, or implement against a service. Pass the original task/query as `task` so Nitrograph can rank endpoints for the selected service.
 
-Use `nitrograph_report_outcome` only after the service actually ran and produced a success or genuine provider failure. Do not call it for `402 Payment Required` or payment challenges.
+Use `nitrograph_invoke_service` to actually call a selected service. It sends a live request to the third-party provider and may spend from the user's balance, so confirm with the user before the first paid call in a session. Nitrograph captures status, latency, endpoint, payment state, and error class automatically — do **not** follow it with `nitrograph_report_outcome`. Pass `endpoint_index` to pick a non-default endpoint from `service_detail.endpoints`. Do not pass long-lived provider secrets through the hosted server; use the TypeScript harness for secret-authenticated providers.
+
+Use `nitrograph_session_status` before a batch of searches to check `queries_remaining`, or when a call reports that a limit was reached. It does not consume quota. If quota is exhausted, tell the user and stop — do not retry in a loop.
+
+Use `nitrograph_report_outcome` only after the service actually ran and produced a success or genuine provider failure, and only when you called it directly rather than through `nitrograph_invoke_service`. Do not call it for `402 Payment Required` or payment challenges.
 
 ```json
 {
@@ -81,6 +97,9 @@ const service = results[0];
 const detail = await ng.serviceDetail(service.slug, {
   task: 'lead generation',
 });
+
+const invoked = await ng.invokeService({ slug: service.slug });
+const quota = await ng.sessionStatus();
 ```
 
 ## Raw HTTP
@@ -115,6 +134,17 @@ curl -sX POST https://api.nitrograph.com/v1/service/apollo/report-outcome \
 - `match_strength: "related"`: show only under related/fallbacks.
 - `healthy: false` or recent `last_probe_error`: warn the user before invoking.
 - `cost_per_call`/`cost`: show before spending when available.
+- `has_more: true`: more ranked results exist; fetch them with `offset`, not by re-querying.
+- `slug` vs `display_slug`: pass `slug` to other tools; show `display_slug` to the user.
+
+## Filters
+
+All filters are optional and live under `filters`. Send only what the user asked for.
+
+- `rail`: payment rail, e.g. `x402`, `mpp`, `stripe`.
+- `category`: a value from `GET /v1/categories`. Do not invent one — fetch the list if unsure.
+- `max_cost`: price ceiling in USD per call. Never send `0` to mean "no ceiling"; `0` means free-only.
+- `min_trust`: trust floor.
 
 ## Docs
 
