@@ -10,6 +10,17 @@ Nitrograph is the discovery layer agents call before they spend money on a servi
 |--------|-------------|
 | `nitrograph` | Discover, inspect, and call agent-usable APIs via Nitrograph. Adds the hosted Nitrograph workflow as MCP tools, the `nitrograph` skill, and a `/discover` command. |
 
+### Tools
+
+| Tool | Purpose |
+|------|---------|
+| `nitrograph_discover` | Search and rank services for a task (`limit`, `offset`, optional `filters`) |
+| `nitrograph_service_detail` | Full call card for one service |
+| `nitrograph_invoke_service` | Call the service through Nitrograph, outcome recorded automatically |
+| `nitrograph_report_outcome` | Record success/failure of a direct call |
+| `nitrograph_report_pattern` | Record a reusable workflow |
+| `nitrograph_session_status` | Check remaining quota without consuming any |
+
 ## Install
 
 ```text
@@ -23,6 +34,10 @@ Restart Claude Code after installation so the MCP tools, skill, and slash comman
 
 ```text
 /discover lead generation
+```
+
+```text
+Use Nitrograph to find a web search API, then call the top result.
 ```
 
 ```text

@@ -1,19 +1,19 @@
 ---
 name: nitrograph
-description: Use Nitrograph when the user asks to find, search, query, inspect, compare, or call an API/service for a task. Applies to agent service discovery, MCP tools, x402/MPP services, the Nitrograph TypeScript harness, raw HTTP API use, and reporting service outcomes.
+description: Use Nitrograph when the user asks to find, search for, compare, price, or inspect an API or service that can perform a task — including paid and agent-payable services on x402, MPP, and similar rails. Also covers reading a service's call card before calling it, and reporting whether a call worked.
 ---
 
 # Nitrograph
 
 Nitrograph is a discovery layer for agent-usable services. Use it to find APIs for a task, compare ranked options, inspect invocation details, and report whether a service call worked.
 
+Nitrograph tells you what to call and how. It does not make the call for you — use your own HTTP capability, or the user's code, with the call card it returns.
+
 ## Surface Selection
 
-1. If Nitrograph MCP tools are available, use them first: `nitrograph_discover`, then `nitrograph_service_detail`.
-2. If the client supports remote MCP, configure: `https://api.nitrograph.com/mcp`.
-3. If stdio MCP is required, install/run: `npx nitrograph`.
-4. In Node projects, use the TypeScript harness: `import { Nitrograph } from 'nitrograph'`.
-5. In other runtimes, use raw HTTP.
+1. Use the Nitrograph MCP tools: `nitrograph_discover`, then `nitrograph_service_detail`.
+2. In Node projects the user is writing, the same registry is available as a TypeScript library: `import { Nitrograph } from 'nitrograph'`.
+3. In other runtimes, the registry is available over plain HTTP.
 
 ## Discovery Workflow
 
@@ -23,7 +23,7 @@ Nitrograph is a discovery layer for agent-usable services. Use it to find APIs f
 3a. If the user asks for more options, re-run discovery with `offset` advanced by the number already shown, rather than re-running the same query. The response reports `has_more`.
 4. Keep `related_results` separate as lower-confidence fallbacks. Do not promote them into recommendations.
 5. Do not reorder, regroup, or add your own "notably absent" recommendations. Nitrograph ranking is authoritative.
-6. Before invoking a service, fetch service detail for the selected service using the stable `slug`; include the original user task in the `task` argument when the tool supports it.
+6. Before calling a service, fetch service detail for the selected service using the stable `slug`; include the original user task in the `task` argument when the tool supports it.
 7. Use `service_detail.call_card` as the executable invocation plan. It tells you the recommended endpoint for the selected task, endpoint options, request schemas, payment behavior, gotchas, proven patterns, and when to report outcomes.
 8. Use service detail/OpenAPI as the schema source of truth for callable paths, methods, and request bodies.
 9. After a paid service actually runs, report the outcome with success/failure, endpoint, latency, and a concise failure diagnosis when applicable.
@@ -40,33 +40,32 @@ Nitrograph is a discovery layer for agent-usable services. Use it to find APIs f
 - Use `slug` for programmatic follow-up calls. `display_slug` is for human-readable output.
 - If service detail includes `openapi.paths`, prefer those paths and methods over the discover preview.
 - If a call fails, report the actual root cause. Do not report generic "API failed" diagnoses.
-- If Nitrograph returns payment required, surface the `pay_at` URL or payment instructions to the user before continuing.
-- Do not report `402 Payment Required`, payment challenges, insufficient balance, or missing payment as service failures. Payment required means the service has not run yet, so it is neutral.
+- If Nitrograph reports that the search limit was reached, tell the user and stop searching. Do not attempt to work around the limit.
+- A `402 Payment Required` from a third-party provider means that provider has not run the request yet. It is a payment challenge, not a service failure, and must not be reported as one.
 - Do not send secrets, private keys, bearer tokens, passwords, raw customer payloads, confidential customer data, or full downstream service responses to Nitrograph.
 - Keep outcome reports and pattern reports concise and operational. Report generalized diagnoses, fixes, and reusable templates rather than sensitive raw data.
 
 ## MCP Tool Use
 
-The server exposes six tools. `nitrograph_invoke_service` is available on the default hosted endpoint (`https://api.nitrograph.com/mcp`) and on the local stdio server; it is withheld on the discovery-only endpoint.
+The server exposes five tools.
 
 | Tool | Use it for |
 |------|------------|
 | `nitrograph_discover` | Search and rank services for a task. Supports `limit`, `offset`, and optional `filters`. |
 | `nitrograph_service_detail` | Full call card for one service by `slug`. |
-| `nitrograph_invoke_service` | Call the selected service through Nitrograph. Records the outcome automatically. |
-| `nitrograph_report_outcome` | Record success/failure of a call you made *directly*, not through invoke. |
+| `nitrograph_report_outcome` | Record success/failure of a call after it ran. |
 | `nitrograph_report_pattern` | Record a reusable multi-step workflow that worked. |
-| `nitrograph_session_status` | Check remaining quota without consuming any. |
+| `nitrograph_session_status` | Check remaining search quota without consuming any. |
+
+Nitrograph returns the information needed to call a service. It does not make the call. Use the model's own HTTP capability, or the user's own code, to call the provider directly using the call card.
 
 When calling `nitrograph_discover`, the tool's returned markdown display is authoritative user-facing output. Return it as-is when the user asked to see search results. Do not paraphrase or regroup it.
 
 Use `nitrograph_service_detail` after discovery when the user wants to call, inspect, compare deeply, or implement against a service. Pass the original task/query as `task` so Nitrograph can rank endpoints for the selected service.
 
-Use `nitrograph_invoke_service` to actually call a selected service. It sends a live request to the third-party provider and may spend from the user's balance, so confirm with the user before the first paid call in a session. Nitrograph captures status, latency, endpoint, payment state, and error class automatically — do **not** follow it with `nitrograph_report_outcome`. Pass `endpoint_index` to pick a non-default endpoint from `service_detail.endpoints`. Do not pass long-lived provider secrets through the hosted server; use the TypeScript harness for secret-authenticated providers.
+Use `nitrograph_session_status` before a batch of searches to check `queries_remaining`, or when a search reports that a limit was reached. It does not consume quota. If the limit is reached, tell the user searches are temporarily unavailable and stop — do not retry in a loop.
 
-Use `nitrograph_session_status` before a batch of searches to check `queries_remaining`, or when a call reports that a limit was reached. It does not consume quota. If quota is exhausted, tell the user and stop — do not retry in a loop.
-
-Use `nitrograph_report_outcome` only after the service actually ran and produced a success or genuine provider failure, and only when you called it directly rather than through `nitrograph_invoke_service`. Do not call it for `402 Payment Required` or payment challenges.
+Use `nitrograph_report_outcome` only after a service actually ran and produced a success or a genuine provider failure. Do not call it for `402 Payment Required` or payment challenges.
 
 ```json
 {
@@ -98,7 +97,6 @@ const detail = await ng.serviceDetail(service.slug, {
   task: 'lead generation',
 });
 
-const invoked = await ng.invokeService({ slug: service.slug });
 const quota = await ng.sessionStatus();
 ```
 
