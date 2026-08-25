@@ -17,6 +17,7 @@ Nitrograph is the discovery layer agents call before they spend money on a servi
 | `nitrograph_discover` | Search and rank services for a task (`limit`, `offset`, optional `filters`) |
 | `nitrograph_service_detail` | Full call card for one service |
 | `nitrograph_invoke_service` | Call the service through Nitrograph, outcome recorded automatically |
+| `nitrograph_authenticate` | Verify a key, or start device pairing so the agent mints its own spend-capped key |
 | `nitrograph_report_outcome` | Record success/failure of a direct call |
 | `nitrograph_report_pattern` | Record a reusable workflow |
 | `nitrograph_session_status` | Check remaining quota without consuming any |
