@@ -30,6 +30,17 @@ Nitrograph is the discovery layer agents call before they spend money on a servi
 
 Restart Claude Code after installation so the MCP tools, skill, and slash command are loaded.
 
+## Authenticate (for paid calls)
+
+Discovery is free and needs no account. To let the agent **invoke** paid
+services, connect once - no key to paste:
+
+- **OAuth (recommended):** `claude mcp add --transport http nitrograph https://api.nitrograph.com/mcp`, then `/mcp` → **Authenticate**. One consent sets spend caps ($1/call, $20/day, $200/month by default); the host holds tokens, you never see a secret. Your first **certified** call is free (a one-time $1 certified-only credit is seeded on connect).
+- **In-chat pairing:** ask the agent to authenticate - it calls `nitrograph_authenticate`, hands you a short code for [nitrograph.com/pair](https://nitrograph.com/pair), and receives its own spend-capped key after your one-time approval.
+- **Manual key (scripts/CI):** create a key at [nitrograph.com/dashboard](https://nitrograph.com/dashboard) and set `NITROGRAPH_API_KEY`.
+
+Every paid call is quoted, validated, refunded on failure, and receipted.
+
 ## Try It
 
 ```text
