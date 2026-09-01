@@ -47,13 +47,14 @@ Nitrograph is a discovery layer for agent-usable services. Use it to find APIs f
 
 ## MCP Tool Use
 
-The server exposes six tools. `nitrograph_invoke_service` is available on the default hosted endpoint (`https://api.nitrograph.com/mcp`) and on the local stdio server; it is withheld on the discovery-only endpoint.
+The server exposes seven tools. `nitrograph_invoke_service` is available on the default hosted endpoint (`https://api.nitrograph.com/mcp`) and on the local stdio server; it is withheld on the discovery-only endpoint.
 
 | Tool | Use it for |
 |------|------------|
 | `nitrograph_discover` | Search and rank services for a task. Supports `limit`, `offset`, and optional `filters`. |
 | `nitrograph_service_detail` | Full call card for one service by `slug`. |
 | `nitrograph_invoke_service` | Call the selected service through Nitrograph. Records the outcome automatically. |
+| `nitrograph_authenticate` | Verify a key, or start device pairing so the agent mints its own spend-capped key. |
 | `nitrograph_report_outcome` | Record success/failure of a call you made *directly*, not through invoke. |
 | `nitrograph_report_pattern` | Record a reusable multi-step workflow that worked. |
 | `nitrograph_session_status` | Check remaining quota without consuming any. |
@@ -61,6 +62,8 @@ The server exposes six tools. `nitrograph_invoke_service` is available on the de
 When calling `nitrograph_discover`, the tool's returned markdown display is authoritative user-facing output. Return it as-is when the user asked to see search results. Do not paraphrase or regroup it.
 
 Use `nitrograph_service_detail` after discovery when the user wants to call, inspect, compare deeply, or implement against a service. Pass the original task/query as `task` so Nitrograph can rank endpoints for the selected service.
+
+Use `nitrograph_authenticate` when the user wants to connect a Nitrograph account for paid calls. With `api_key`, it verifies the key they provided. With no arguments, it starts device pairing: give the user the short code and URL, then call again with the returned `device_token` to poll. On approval you receive a spend-capped `ng_live_` key exactly once — store it and pass it as `api_key` on later Nitrograph calls.
 
 Use `nitrograph_invoke_service` to actually call a selected service. It sends a live request to the third-party provider and may spend from the user's balance, so confirm with the user before the first paid call in a session. Nitrograph captures status, latency, endpoint, payment state, and error class automatically — do **not** follow it with `nitrograph_report_outcome`. Pass `endpoint_index` to pick a non-default endpoint from `service_detail.endpoints`. Do not pass long-lived provider secrets through the hosted server; use the TypeScript harness for secret-authenticated providers.
 

@@ -9,6 +9,7 @@ Nitrograph is the discovery layer agents call before they spend money on a servi
 | Plugin | Description |
 |--------|-------------|
 | `nitrograph` | Discover, inspect, and call agent-usable APIs via Nitrograph. Adds the hosted Nitrograph workflow as MCP tools, the `nitrograph` skill, and a `/discover` command. |
+| `nitrograph-research` | Validated, pay-per-result research and enrichment (also listed in this marketplace). |
 
 ### Tools
 
